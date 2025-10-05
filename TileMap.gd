@@ -44,6 +44,7 @@ var j_270 := [Vector2i(1, 0), Vector2i(1, 1), Vector2i(0, 2), Vector2i(1, 2)]
 var j := [j_0, j_90, j_180, j_270]
 
 var shapes := [i, t, o, z, s, l, j]
+var shapes_full := [i, t, o, z, s, l, j]
 
 #grid variables
 const COLS : int = 10
@@ -66,14 +67,31 @@ var active_layer : int = 1
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	new_game()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	draw_piece(j[0], Vector2i(5,1), Vector2i(1,0))
+	draw_piece(piece_type[0], Vector2i(5,1), Vector2i(0,0))
 
 	
 func draw_piece(piece, pos, atlas):
 	for i in piece:
 		set_cell(active_layer, pos + i, tile_id, atlas)
+		
+func pick_piece():
+	var piece 
+	if not shapes.is_empty():
+		shapes.shuffle()
+		piece = shapes.pop_front()
+	else:
+		shapes = shapes_full.duplicate()
+		shapes.shuffle()
+		piece = shapes.pop_front()
+	return piece
+		
+func new_game():
+	piece_type = pick_piece()
+	
+
+	
