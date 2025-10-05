@@ -50,6 +50,13 @@ var shapes_full := [i, t, o, z, s, l, j]
 const COLS : int = 10
 const ROWS : int = 20
 
+#moemenet variables 
+var steps : int
+const step_req : int = 50
+const start_pos = Vector2i(5,1)
+var cur_pos : Vector2i
+var speed : float
+
 #game piece variables
 var piece_type
 var next_piece_type
@@ -68,17 +75,24 @@ var active_layer : int = 1
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	new_game()
-
+	
+func new_game():
+	#reset variables
+	speed = 1.0
+	steps = 0
+	
+	piece_type = pick_piece()
+	piece_atlas = Vector2i(shapes_full.find(piece_type), 0)
+	create_piece()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	draw_piece(piece_type[0], Vector2i(5,1), Vector2i(0,0))
+	#applay downard movement every frame
+	steps += speed
+	if steps >  step_req:
+		move_piece(Vector2i.DOWN)
+		steps = 0
 
-	
-func draw_piece(piece, pos, atlas):
-	for i in piece:
-		set_cell(active_layer, pos + i, tile_id, atlas)
-		
 func pick_piece():
 	var piece 
 	if not shapes.is_empty():
@@ -89,9 +103,26 @@ func pick_piece():
 		shapes.shuffle()
 		piece = shapes.pop_front()
 	return piece
+	
+func create_piece():
+	cur_pos = start_pos
+	active_piece = piece_type[rotation_index]
+	draw_piece(piece_type[0], cur_pos, piece_atlas)
+
+func clear_piece():
+	for i in active_piece:
+		erase_cell(active_layer, cur_pos+i)
+	
+func draw_piece(piece, pos, atlas):
+	for i in piece:
+		set_cell(active_layer, pos + i, tile_id, atlas)
 		
-func new_game():
-	piece_type = pick_piece()
+func move_piece(dir):
+	clear_piece()	
+	cur_pos += dir
+	draw_piece(active_piece, cur_pos, piece_atlas)
+		
+
 	
 
 	
